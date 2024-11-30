@@ -4,7 +4,7 @@ class Database:
     def __init__(self, db_name='pagamentos.db'):
         self.conn = sqlite3.connect(db_name)
         self.create_table()
-    
+
     def create_table(self):
         cursor = self.conn.cursor()
         cursor.execute('''
@@ -30,10 +30,14 @@ class Database:
             return None
 
     def add_payment(self, data, valor, descricao, cliente, metodo):
-        self.execute_query('''
-            INSERT INTO pagamentos (data, valor, descricao, cliente, metodo)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (data, valor, descricao, cliente, metodo))
+        try:
+            valor = float(valor)
+            self.execute_query('''
+                INSERT INTO pagamentos (data, valor, descricao, cliente, metodo)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (data, valor, descricao, cliente, metodo))
+        except ValueError:
+            print("Erro: Valor inválido ao adicionar pagamento.")
 
     def get_all_payments(self):
         return self.execute_query('SELECT * FROM pagamentos ORDER BY data DESC')
